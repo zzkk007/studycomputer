@@ -35,6 +35,25 @@
         
         在Java SE 8中，静态方法可以写在接口中，不再需要为实用工具方法另外提供一个伴随类。
         
+        Java SE 8 新特性:
+            
+            Lambda 表达式 - Lambda 允许把函数做为一个方法的参数。
+            
+            方法引用 - 方法引用提供了非常有用的语法，可以直接引用已有的Java类或对象（实例）的方法或构造器。与lambda联合使用，
+                     方法引用可以使语言结构更紧凑简洁、减少代码冗余。
+            
+            默认方法 - 默认方法就是一个在接口里面有了一个实现的方法
+            
+            新工具 − 新的编译工具，如：Nashorn引擎 jjs、 类依赖分析器jdeps。
+            
+            Stream API −新添加的Stream API（java.util.stream） 把真正的函数式编程风格引入到Java中。
+            
+            Date Time API − 加强对日期与时间的处理。
+            
+            Optional 类 − Optional 类已经成为 Java 8 类库的一部分，用来解决空指针异常。
+            
+            Nashorn, JavaScript 引擎 − Java 8提供了一个新的Nashorn javascript引擎，它允许我们在JVM上运行特定的javascript应用。          
+                             
         
     6.3.1 lambda 表达式
     
@@ -95,6 +114,70 @@
         如果一个 lambda 表达式只在某些分支返回一个值， 而在另外一些分支不返回值，
         这是不合法的。例如，（int x)-> { if(x >= 0) return 1; } 就不合法。
             
+            
+    6.3.3 函数式接口:
+    
+        java 中已经有很多封装代码块的接口，如果Comparator。lambda 表达式与这些接口是兼容的。
+        对于只有一个抽象方法的接口，需要这种接口对象时，就可以提供一个lambda表达式。这种接口称为函数式接口。
+        
+        为了展示如何转换为函数式接口，下面考虑 Arrays.sort 方法。
+        它的第二个参数需要一个 Comparator 实例， Comparator 就是只有一个方法的接口， 所以可以提供一个 lambda 表达式：
+        Arrays.sort (words, (first, second) -> first.length() - second.length()) ;
+        在底层， Arrays.sort 方法会接收实现了 Comparator<String> 的某个类的对象。
+        在这个对象上调用 compare 方法执行这个 lambda 表达式的体。
+        
+        最好把 lambad 表达式看作是一个函数，而不是对象，接受 lambda表达式可以传递到函数式接口。
+        lambda 表达式可以转换为接口，这一点让 lambda 表达式很有吸引力。
+        在Java中， 对lambda 表达式所能做的也只是能转换为函数式接口。
+        不能把 lambda 表达式赋给类型为 Object 的变量，Object 不是一个函数式接口。
+        想要用 lambda 表达式做处理，还要谨记表达式用途，为它建立一个特定的函数式接口。
+        
+    6.3.4 方法引用:
+        
+        方法引用使用 :: 操作符分隔方法名与对象或类名。主要有 3 种情况。
+            object::instanceMethod
+            Class::staticeMethod
+            Class::instanceMethod
+        
+        在前 2 种情况中，方法引用等价于提供方法参数的 lambda 表达式。前面已经提到，
+        System.out::println 等价于 x -> System.out.println(x)。 
+        类似地，Math::pow 等价于（x，y) -> Math.pow(x, y)。
+        对于第 3 种情况，第 1 个参数会成为方法的目标。例如, String::compareToIgnoreCase 等
+        同于 (x, y) -> x.compareToIgnoreCase(y) 0   
+        
+    6.3.6 变量作用域
+    
+        lambda 表达式有3个部分:
+            a、一个代码块
+            b、参数
+            c、自由变量的值，这个是指非参数而且不在代码中定义的值。可以把l lambda 表达式转换为包含一个方法的对象
+               这个自由变量的值就会复制到这个对象的实例变量中。
+                
+              lambda 表达式可以捕获外围作用域中变量的值。 在 Java 中，要确保所捕获的值是明确定义的，这里有一个重要的限制。
+              在 lambda 表达式中， 只能引用值不会改变的变量。  之所以有这个限制是有原因的。
+              如果在 lambda 表达式中改变变量， 并发执行多个动作时就会不安全。      
+              
+              另外如果在 lambda 表达式中引用变量， 而这个变量可能在外部改变，这也是不合法的。
+              lambda 表达式中捕获的变量必须实际上是最终变量 ( effectivelyfinal)。
+              实际上的最终变量是指，这个变量初始化之后就不会再为它赋新值。
+        
+              lambda 表达式的体与嵌套块有相同的作用域。
+    
+     6.3.7 处理 lambda 表达式
+        
+            lambda 表达式重点是 延迟执行。
+                在一个单独的线程中运行代码
+                多次运行代码
+                在算法适当位置运行代码(例如: 排序中的比较操作)
+                发生某种情况时执行代码
+                只在必要时才运行代码
+                
+     6.4 内部类
+     
+                       
+        
+        
+        
         
              
 
