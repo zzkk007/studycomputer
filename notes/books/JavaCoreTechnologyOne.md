@@ -61,7 +61,7 @@
          
     6.3.2 lambda 表达式的语法
     
-        再来考虑上一节讨论的排序例子。我们传人代码来检查一个字符串是否比另一个字符串
+        再来考虑上一节讨论的排序例子。我们传入代码来检查一个字符串是否比另一个字符串
         短。这里要计算:
             first.lenth() - second.length();
         java是强类型语言，我们需要指定类型
@@ -70,9 +70,30 @@
         
         带参数变量的表达式被成为 lambda 表达式。
         
+        java中的一种 lambda 表现形式: 参数，箭头(->)以及一个表达式。
+        如果代码要完成的计算无法放在一个表达式中，就可以像写方法一样，把代码写在{}中，并包含显示的 return 语句。
+        
+            (String first, String second) -> {
+                
+                if(first.length() < second.length()) return -1;
+                else if(first.length() > second.length()) return 1;
+                elset return 0;
+            }
+            
+        即使 lambda 表达式没有参数， 仍然要提供空括号，就像无参数方法一样： 
+            () -> { for (int i = 100;i >= 0;i ) System.out.println(i); }    
+        
+        如果可以推导出一个 lambda 表达式的参数类型，则可以忽略其类型。
+        如果方法只有一 参数， 而且这个参数的类型可以推导得出，那么甚至还可以省略小括号。
+                
+        无需指定 lambda 表达式的返回类型。lambda 表达式的返回类型总是会由上下文推导得
+        出。例如，下面的表达式
+            (String first, String second) -> first.length() - second.length()
+        可以在需要 int 类型结果的上下文中使用
         
         
-        
+        如果一个 lambda 表达式只在某些分支返回一个值， 而在另外一些分支不返回值，
+        这是不合法的。例如，（int x)-> { if(x >= 0) return 1; } 就不合法。
             
         
              

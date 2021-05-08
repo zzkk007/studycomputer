@@ -2,6 +2,9 @@ package books.javacoreone;
 
 import java.util.Arrays;
 
+/**
+ * 接口的使用，排序
+ */
 public class EmployeeSortTest {
 
     public static void main(String[] args) {
@@ -16,14 +19,5 @@ public class EmployeeSortTest {
         for (int i = 0; i < staff.length; i++) {
             System.out.println("name=" + staff[i].getName() + ", salary" + staff[i].getSalary());
         }
-
-
-
-
-
-
-        System.out.println("jjj");
-
-
     }
 }
