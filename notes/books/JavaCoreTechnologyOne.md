@@ -206,13 +206,120 @@
             有时间，使用内部类只是为了把一个类隐藏在另一个类的内部，并不需要内部类引用外围类对象。
             可以将内部类声明为static,以便消除产生的引用。
 
+    6.5 代理        
         
+        代理(proxy) 利用代理可以在运行时创建一个实现类一组给定接口定新类。这种功能只有在编译时无法确定
+        需要实现那个接口时才有必要使用。
+
+    
+## 第 7 章 异常、断言和日志
+
+    错误不可避免，代码至少做到下面三点：向用户通告错误、保存所有的工作结果、允许用户以妥善的形式退出程序。
+
+    7.1 处理错误
+        异常处理的任务是将控制权从错误产生的地方转移给能够处理这种情况的错误处理器。
+        
+        在Java中，如果某个方法不能够采用正常的途径完整它的任务，就可以通告另外一个路径退出方法。
+        在这种情况下，方法并不返回任何值，而是抛出(throw)一个封装类错误信息的对象。注意：方法会立刻退出，
+        并不返回任何值。此外，调用这个方法的代码也将无法继续执行，取而代之的是，异常处理机制开始搜索能够
+        处理这种异常的异常处理器(exception handler)。
+
+        7.1.1 异常分类
+        
+            Java 语言规范将派生 Error类或RuntimeException类的所有异常称为非受查异常，其他的都是受查异常。
+            编译器将核查是否为所有的受查异常提个了异常处理器。
+
+            一个方法必须声明所有可能抛出的受查异常，而非受查异常要么不可控（Error）,要么就应该避免发生(RuntimeException).
+            如果方法没有声明可能发生的受查异常，编译器报错。
+
+        7.1.3 如何抛出异常
+        
+            对于一个已经存在的异常类，将其抛出非常容易。
+                throw new RuntimeException();
+                找到合适的异常类，创建这个类对象，将对象抛出。
+
+    7.2 捕获异常
+        
+        如果异常发生没有捕获，那么程序会中止执行，并在控制台打印出异常信息，包括异常类型和堆栈内容。
+        
+            try{
+                code
+            }catch(ExceptionType e){
+                handler for this type;
+            }
+        
+        如果方法中抛出了一个在 catch 子句中没有声明的异常类型，那么方法立刻退出。
+        通常，捕获知道如何处理的异常，传递不知道怎么处理的异常。
+        想传递一个异常，必须在方法首部添加一个 throws 说明符，以便告知调用着这个方法可能抛出的异常。
+
+        在catch子句中可以抛出一个异常，这种做的目的是改变异常的类型。
+        
+            try{
+                access database
+            } catch(SQLException e){
+                throw new SeveltException("database error:" +  e.getMessage());
+            }
+
+        还有一种更好的方法，将原始异常信息设置为新异常的"原因"
+            try{
+                access database
+            }catch (SQLException e){
+                Throw se = new SevletException("database error");
+                se.initCause(e);
+                throw se;
+            }
+
+        当捕获异常时，可以使用下面语句重新获取原始异常
+            Throwable e = se.getCause();
+    
+        
+        带资源的 try 语句：
             
-                
+            try(Resource res = ...){
+                work with res
+            }
+
+            try(Scanner in = new Scanner(new FileInputStream("/usr/share/dict/works"), "UTF-8")){
+                while(in.hasNext())
+                    ...
+            }
+            代码正常退出或异常时，都会调用 in.close() 方法，好像使用了 finally 一样。
+
+    7.3 使用异常技巧
+        
+        a、异常不能代替简单的测试
+        
+            例如，退栈操作，检测栈是否为空。
+                if(!s.empty()) s.pop()
+           捕获异常
+                try{
+                    s.pop()
+                }catch(EmptyStackException e){
+                }
+            捕获异常耗时更多
+        
+        b、不要过分细化异常
+        
+        c、利用异常层次机构
+            不要只抛出 RuntimeException 异常。应该寻找更加适当的子类或创建自己的异常类。
+            不要只捕获 Thowable 异常， 否则，会使程序代码更难读、 更难维护。
+            考虑受查异常与非受查异常的区别。已检查异常本来就很庞大，不要为逻辑错误抛出这些异常。
             
-            
-            
-                       
+        d、不要压制异常
+            public Image loadImage(String s) {
+                try
+                { // code that threatens to throw checked exceptions
+                }
+                catch (Exception e) {} // so there
+                }
+            现在，这段代码就可以通过编译了。除非发生异常，否则它将可以正常地运行。即使发
+            生了异常也会被忽略。如果认为异常非常重要，就应该对它们进行处理。        
+        
+        e、  在检测错误时，"苛刻" 要比放任更好
+            检测数据，在出错的地方抛出一个 EmptyStackException异常要比在后面抛出一个 NullPointerException 异常更好。           
+
+        f、不要修羞于传递异常
+        
         
         
         
