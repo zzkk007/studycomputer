@@ -10,5 +10,6 @@
         <module name="study.computer" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="8" />
   </component>
 </project>
