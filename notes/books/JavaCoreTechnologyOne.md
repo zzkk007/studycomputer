@@ -355,7 +355,104 @@
     
         泛型方法既可以定义在普通类中，也可以定义在泛型类中。
         当调用一个泛型方法时,在方法名前的尖括号中放人具体的类型。
+        当调用一个泛型方法时，在方法名前当尖括号中放入具体当类型。
+
+    8.4 类型变量当限定
+    
+        有时，类或方法需要对类型变量加以约束。
+            
+            class ArrayAlg{
+                public static <T> T min(T[] a){
+                    if (a == null || a.length() == 0) return null;
+                    for(int i = 1; i < a.length; i ++){
+                        if(smallest.compareTo(a[i]) >0) smallest = a[i];
+                    }
+                    return smallest;
+                }
+            }        
+
+        变量 smallest 类型为 T，怎么确信 T 所属对类有 compareTo 方法呢？
+            public static <T extends Comparable> T min(T[] a)
+
+        记法：
+            <T extends BoundingType> 表示 T 英国时绑定类型对子类型，T和绑定类型可以时类，也可以是接口。
+            一个类型变量或通配符可以有多个限定， 例如： T extends Comparable & Serializable
+            限定类型用“ &” 分隔，而逗号用来分隔类型变量。
+
+    8.5 泛型代码和虚拟机：
+
+        虚拟机没有泛型类型对象--所有对象都属于普通类。
+        无论何时定义一个泛型类型，都自动提供类一个相应都原始类型，原始类型都名字就是删去类型参数后的泛型类型名。
+    
+    8.6 约束与局限性
+
+        大多数限制都是由类型擦除引起的。
+
+        1、不能用基本类型实例化类型参数，没有Pair<double>,只有Pair<Double>,当然原因是类型擦除，Pair类含有 Object 类型域
+        而 Object 不能存储 doubel 值。
+
+        2、运行时类型查询只使用于原始类型
+            虚拟机的对象总有一个特定的非泛型类型。因此，所有的类型查询只产生原始类型。
+            例如：if(a instanceof Pair<String>) // Error
+                 if(a instanceof Pair<T>)      // Error
+
+        3、不能创建参数化类型的数组
+            不能实例化参数化类型的数组，例如：Pair<String>[] table = new Pair<String>[10]; //Error
+            数组会记住它的元素类型，如果试图存储其他类型的元素，就会抛出一个 ArrayStorException 异常。
+
+        4、不能实例化类型变量
+            不能使用像 new T(...), new T[...] 或 T.class 这样的表达式的类型变量。
+
+        5、不能构造泛型数组
+
+        6、泛型类的静态上下文中类型变量无效
+            public class Sington<T>{
+                private static T singleInstance; // Error
+                public static T getSingleInstance(){ // Error
+                }
+            }
+
+    8.7 泛型类型的继承规则：
+
+        考虑一个类和一个子类 如 Employee 和 Manager.
+        Pair<manager> 和 Pair<Employee> 没有关系。
+        无论 S 和 T 什么关系，Pair<S> 和 Pair<T> 没有关系。
+
+
+    8.8 通配符类型：
         
+        固定的泛型类型系统使用起来并没有那么令人愉快。通配符类型解决类这个烦恼。
+        通配符概念，通配符类型中，运行类型参数变化。如
+            Pair<? extends Employee>
+        表示任何泛型 Pair 类型，他的类型是 Employee的子类，如 Pari<Manager>,但不是Pair<String>。
+        public static void printBuddies<Pair<? extends Employee> p>
+
+        通配符的超类型限定：
+            通配符限定与类型限定十分类似，但可以指定一个超类型限定： 
+                ？super Manager 
+            这个通配符限制为 Manager的所有超类型。
+
+        带有超类型限定的通配符可以向泛型对象写入，带有子类型限定的通配符可以从泛型对象读取。
+
+        通配符不是类型变量，不能在编写代码中使用 "?" 作为一种类型。
+            
+
+    
+
+
+
+
+
+
+
+
+
+        
+        
+        
+    
+            
+
         
          
           
