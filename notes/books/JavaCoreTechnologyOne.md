@@ -436,7 +436,185 @@
 
         通配符不是类型变量，不能在编写代码中使用 "?" 作为一种类型。
             
+    8.9 反射和泛型
+        
 
+## 第九章 集合
+    
+    9.1 java 集合框架
+       
+        1、将集合的接口与实现分离
+            java集合类库将接口与实现分离。如队列(queue)是如何实现分离的。
+            队列接口指出可以在队列的尾部添加元素，在队列的头部删除元素，并且可以查找队列中元素的个数。
+            
+            队列接口最简单的形式如下：
+                public interface Queue<E>{
+                    void add(E element);
+                    E remove();
+                    int size();
+                }         
+    
+            这个接口并没有说明队列如何实现的，队列常用的两种实现方式：一种是使用循环数组；另一种是使用链表。
+            每一个实现都可以通过一个实现了 Queue 接口的类表示。
+            public class CircularArrayQueue<E> implements Queue<E>{
+                private int head;
+                private int tail;
+                
+                CircularArrayQueue(int capacity){...}
+                public void add(E elemet){...}
+                public E remove(){...}
+                public int size(){...}
+                private E[] elements;
+            }
+            
+            public class LinkedListQueue<E> implements Queue<E>{
+                private Link head;
+                private Link tail;
+                
+                LinkedListQueue(){...}
+                public void add(E elemet){....}
+                public E remove(){...}
+                public int size(){...}
+            }
+            
+            实际上，Java 类库没有名为 CircularArrayQueue 和 LinkedListQueue 的类。 这里，
+            只是以这些类作为示例， 解释一下集合接口与实现在概念上的不同。如果需要一个循环
+            数组队列，就可以使用 ArrayDeque 类。如果需要一个链表队列， 就直接使用 LinkedList
+            类， 这个类实现了 Queue 接口。
+            
+        2、Collection 接口：
+            
+            在 Java l类库中，集合类的基本接口是 Collection 接口。这个接口有两个基本的方法：
+            
+                public interface Collection<E
+                {
+                    boolean add(E element)
+                    Iterator<E> iterator();
+                }
+                
+            add 方法用于向集合中添加元素，如果添加元素确实改变了集合就返回 ture,如果没有发生改变就false。
+            如果试图向集合中添加一个对象，而这个对象在集合中已经存在，这个添加请求无效，因为集合中不允许有重复对象。
+            
+            iterator方法用于返回实现了 Iterator 接口的对象。可以使用迭代器对象依次访问集合中的元素。
+            
+        3、迭代器：
+            
+            Iterator 接口包含四个方法。
+            
+            public interface Iterator<E>
+            {
+                E next();
+                boolean hasNext();
+                void remove();
+                default void forEachRemaining(Consumer<? Super E> action)
+            }
+            
+            通过反复调用 next 方法，可以逐个访问集合中的每个元素。但是，如果到达了集合的末
+            尾，next 方法将抛出一个 NoSuchElementException。 因此，需要在调用 next 之前调用 hasNext
+            方法。如果迭代器对象还有多个供访问的元素， 这个方法就返回 true。如果想要査看集合中的
+            所有元素，就请求一个迭代器，并在 hasNext 返回 true 时反复地调用 next 方法。
+            
+            Collection<String> c = ...;
+            Iterator<String> iter = c.iterator();
+            while(iter.hasNext()){
+                String element = iter.next();
+                // do something with element
+            }
+            用“for each” 循环可以更加简练地表示同样的循环操作。
+            for(String element : c){
+                //do something with element;
+            }
+            编译器简单地将 “for each”循环翻译为带有迭代器的循环。
+            
+            "for each" 循环可以与任何实现了 Iterable 接口的对象一起工作，这个接口包含一个抽象方法。
+            public interface Iterable<E>{
+                Iterator<E> iterator();
+            }
+            
+            Collection接口扩展了 Iterable 接口。
+    
+       4、 泛型实用方法
+       
+            Collection 接口声明了很多有用的方法，所有的实现类都必须提供这些方法。
+                int sizeO
+                boolean isEmptyO
+                boolean contains(Object obj)
+                boolean containsAl1 (Col1ection<?> c)
+                boolean equals(Object other)
+                boolean addAll (Collection<? extends E> from)
+                boolean remove (Object obj)
+                boolean removeAl1 (Col1ection<?> c)
+                void cl ear()
+                boolean retainAl1 (Col1ection<?> c)
+                Object口 toArrayO
+                <T> T[] toA「ray(T[] arrayToFill)
+            
+            当然， 如果实现 Collection 接口的每一个类都要提供如此多的例行方法将是一件很烦人的
+            事情。为了能够让实现者更容易地实现这个接口，Java 类库提供了一个类 AbstractCollection，
+            它将基础方法 size 和 iterator 抽象化了
+            
+                public abstract class Abstracted1ection<E> implements Collection<E>
+                {
+                    ....
+                    public abstract Iterator<E> iterator() ;
+                    
+                    public boolean contai ns(Object obj) {
+                        for (E element : this) // calls iteratorO
+                            if (element ,equals(obj))
+                                return = true;
+                        return false;
+                    }
+                    ....
+                }
+                
+            此时， 一个具体的集合类可以扩展 AbstractCollection 类了。现在要由具体的集合类提供
+            iterator 方法， 而 contains 方法已由 AbstractCollection 超类提供了。
+            然而， 如果子类有更加有效的方式实现 contains 方法， 也可以由子类提供， 就这点而言，没有什么限制。
+            对于 Java SE 8, 这种方法有些过时了。 如果这些方法是 Collection 接口的默  
+                
+       5、集合框架中的接口：
+            
+            集合有两个基本接口: Collection 和 Map 
+            Collection : List、Set、Queue
+            Map: sortedMap
+            
+            List 接口： List 是一个有序集合。元素会增加到容器中的特定位置。
+            可以采用两种方式访问元素: 使用迭代器访问，或使用一个整数索引来访问(随机访问)。
+            List接口定义了多个用于随机访问的方法：
+                void add(int index, E element);
+                void remove(int index);
+                E get(int index);
+                E set(int index, E element);
+                
+            Listlterator 接口是 Iterator 的一个子接口。它定义了一个方法用于在迭代器位置前面增加
+            一个元素：void add(E element)
+           
+           Set 接口：等同于 Collection 接口，不过方法更严谨。add方法不允许增加重复元素。
+                            
+    9.2 具体的集合：
+    
+                    
+            
+            
+            
+            
+                 
+             
+                 
+               
+            
+            
+                
+       
+             
+            
+            
+            
+                  
+          
+            
+    
+            
     
 
 
