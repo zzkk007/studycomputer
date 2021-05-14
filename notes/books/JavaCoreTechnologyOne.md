@@ -594,8 +594,8 @@
     9.2 具体的集合：
     
         
-        ArrayList       一种可以动态增长和缩减的索引序列
-        LinkedList      一种可以在任何位置进行高效地插人和删除操作的有序序列
+        ArrayList       一种可以动态增长和缩减的索引序列，数组列表
+        LinkedList      一种可以在任何位置进行高效地插人和删除操作的有序序列， 链表
        
         ArrayDeque      一种用循环数组实现的双端队列
        
@@ -604,15 +604,42 @@
         EnumSet         一种包含枚举类型值的集
         LinkedHashSet   一种可以记住元素插人次序的集
         PriorityQueue   一种允许高效删除最小元素的集合
-        
+
         HashMap         一种存储键 / 值关联的数据结构
         TreeMap         一种键值有序排列的映射表
         EnumMap         一种键值属于枚举类型的映射表
         LinkedHashMap   一种可以记住键 / 值项添加次序的映射表
         WeakHashMap     一种其值无用武之地后可以被垃圾回收器回收的映射表
         IdentityHashMap 一种用 =而不是用 equals 比较键值的映射表
+         
+        Java 库映射两个实现：HashMap 和 TreeMap, 散列映射对键进行散列，树映射用键对整体顺序对元素进行排序，
+        并将其组织成搜索树。散列或比较函数只能作用于键，于键关联对值不能进行散列或比较。
+
+    9.3 映射：
         
+        1、更新映射项
+            counts.put(word, conts.get(word) + 1);
+            当第一次看的 word 时，get会返回null,会出现一个 NullPointerException 异常。
+            简单补救方法，使用getOrDefault 方法：
+            counts.put(world, counts.getOrDefault(word, 0) + 1);
+            
+            另一种方法是首先调用 putIfAbsent方法，只有当键原先存在时才放入一个值。
+            counts.putIfAbsent(word, 0);
+            counts.put(word, conts.get(word) + 1);
+
+            merge方法可以简化这个常见对操作。
+            counts.merge(word, 1, Integer::sum);
+            将把word与1关联，否则使用 Intger::sum函数组合原值和1（将原值与1求和）。
+
+        2、映射视图：
+            集合框架不认为映射本身是一个集合。但可以得当映射但视图。
+            有三种视图：键集 Set<K> keySet()、值集合 Collection<V> values()、以及键/值对集 Set<Map.Entry<k, v>> entrySet()。
+
+
+            
+
         
+            
         
         
         
