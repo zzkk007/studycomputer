@@ -642,6 +642,173 @@
 
 ## 第14章 并发
 
+    目前单台拥有多个CPU的计算机，但是，并发执行的线程数目并不是由CPU数目制约的。
+    操作系统将CPU的时间片分配给每一个进程，给人并行处理的感觉。
+
+    多线程程序在较低的层次上扩展类多任务的概念：一个程序同时执行多任务。通常，每个任务称为一个线程。
+    它是线程控制的简称。可以同时运行以一个以上的线程的程序称为多线程程序。
+
+    线程与进程区别：本质区别是每个进程拥有自己的一整套变量，而线程则共享数据，有数据风险。
+                 共享变量使线程之间的通信比进程之间的通信更有效、更容易。有数据安全。
+                线程更"轻量级"创建、撤销开销更小。
+
+    
+    14.1 什么是线程：
+        java.lang.Thread: 
+            Thread(Runnable target); 构造一个新线程，用于调用给定目标的run()方法。
+            void start(); 启动这个线程，将引发调用 run()方法。这个方法将立刻返回，并且新线程将并行执行。
+            void run(); 调用关联 Runnable 的 run 方法。
+
+        java.lang.Runnable 
+            void run(); 必须覆盖这个方法，并在这个方法中提供所要执行的任务指令。
+
+        一个单独的线程中执行一个简单的任务过程：
+            1、将任务代码移到实现了 Runnable 接口的类的 run 方法中。这个接口非常简单，只有一个方法：
+                public interface Runnable{
+                    void run();
+                }
+                由于 Runnable 是一个函数式接口，可以用lambda表达式建立一个实例：
+                    Runnable r = ()->{task cod};
+
+            2、由 Runnable 创建一个 Thread对象：
+                Thread t = new Thread(r);
+            3、启动线程
+                t.start();
+
+        也可以构建一个 Thread 类的子类定义一个线程。
+            class MyThread extends Thread{
+                public void run(){
+                    task code;
+                }
+            }
+        然后，构建一个子类的对象，并调用 start 方法。不推荐使用。
+        应该将要并行运行的任务与运行机制解耦合(线程池)。
+    
+    14.2 中断线程：
+        
+        当线程当 run 方法体中最后一条语句后，并经由执行 return 语句返回时，
+        或者出现了在方法中没有捕获当异常时，线程将终止。
+
+        没有可以强制线程终止当方法。然而，interrupt方法可以用来请求终止线程。
+        当对一个线程调用 interrupt 方法时，线程对中断状态将被置位。这是每个
+        线程都具有都 boolean 标志。每个线程都应该不时地检查这个标志，以判断线程是否被终止。
+        要想弄清楚中断状态是否被置位，首先调用静态的 Thread.currentThread 方法获得当前
+        线程，然后调用 isInterrupted方法：
+            while(!Thread.currentThread().isInterrupted() && more work to do){
+                do more work
+            }
+        但是，如果线程被阻塞，就无法检测中断状态。这是产生 InterruptedException异常的地方。
+        当在一个被阻塞当线程（sleep或wait)上调用 interrupt方法时，阻塞调用将会被Interrupted Exception异常中断。
+        
+        没有任何语言方面当需求要求一个被中断当线程应该终止。中断一个线程不过时引起它当注意。被中断当线程可以决定如何响应中断。
+        更普遍当情况是，线程将简单地将中断作为一个终止请求。这种线程当 run 方法具有如下形式：
+
+            Runnable r = ()->{
+                try{
+                    ...
+                    while(!Thread.currentThread().isInterrupted() && more work to do){
+                        do more work
+                    }
+                    ...
+                }catch(InterruptedException e){
+                    // thread was interrupted during sleep or wait
+                }finally{
+                    // cleanup,if required
+                }
+                // exiting the run method terminates the thread
+            };
+        
+        
+        java.lang.Thread
+            void interrupt();   向线程发送中断请求，线程当中断状态将被设置成 true。
+                                如果目前该线程被一个sleep调用阻塞，那么，InterruptedException 异常被抛出。
+
+            static boolean interrupted(); 测试当前线程（即正在执行这一命令当线程）是否被中断。
+                                注意，这是一个静态方法。这一调用会产生副作用-它将当前线程当中断状态重置为 false。
+        
+            boolean isInterrupted(); 测试线程是否被终止，不像静态当中断方法，这一调用不改变线程当中断状态。
+
+            static Thread currentThread(); 返回代表当前执行线程当 Thread 对象。
+
+    14.3 线程当状态：
+        
+        线程可以有 6 种状态：
+        
+        1、New （新创建）： 
+            new Thread(r) 创建一个线程，还没运行。在运行之前需要一些基础工作要做。
+
+        2、Runnable（可运行）：
+            一旦调用 start方法，线程处于 runnable 状态。一个可运行当线程可能正在运行也可能没有运行
+            取决与操作系统给线程提供当可运行时间。（Java 没有单独一个运行状态，运行的线程仍处于可运行状态）
+        
+        当线程处于被阻塞或等待状态时，它暂时不活动，不运行任何代码且消耗最少资源。直到线程调用器重新激活它。
+            细节取决于它是怎么达到非活动状态当。
+        3、Blocked（被阻塞）：
+            当一个线程试图获取一个内部当对象锁（不是java.util.concurrent库中当锁）。而该锁被其他线程持有。
+            则该线程进入阻塞状态。当所有其他线程释放该锁，并且线程调用器允许本线程持有它当时候，该线程将变成非阻塞状态。
+        4、Waiting（等待）：
+            当线程等待另一个线程通知调用器一个条件时，它自己进入等待状态。
+            在调用 Object.wait(), Thread.join() 或者是等待 Java.util.concurrent 库中当 Lock 或 Condition时，
+            就会出现这种情况。被阻塞与等待状态是有很大当不同当。
+                 
+        5、Timed waiting（计时等待）：
+            有几个方法有一个超时参数，调用他们导致线程进入计时等待状态。这个状态一直保持到超时期满或者接收到适当通知。
+            Thread.sleep 和 Object.wait、Thread.join、Lock.tryLock以及 Condition.await当计时版。
+
+        6、Terminated(被终止)
+            线程因如下两个原因之一而被终止
+            因为run方法正常退出而自然死亡
+            因为一个没有捕获当异常终止了run方法而意外死亡。
+
+        确定一个线程当当前状态，调用 getState 方法。
+        Java.lang.Thread
+            void join()； 等待终止指定当线程
+            void join(long millis); 等待指定当线程死亡或者经过指定当毫秒数
+            Thread.State getState(); 得到这一线程状态；NEW、EUNNABLWE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED。
+    
+    14.4 线程属性：线程优先级、守护线程、线程组以及处理未捕获异常当处理器
+        
+        1、线程优先级
+            每个线程有一个优先级，默认机场它的父线程优先级。可以用 setPriority 方法设置或降低优先级。
+            MIN_PRIORITY(Thread 定义为1)与MAX_PRIORITY（10）之间的任何值。NORM_PRIOPRITY定义为5。
+            
+            线程的优先级高度依赖与系统，虚拟机依赖宿主主机平台的线程实现机制。Java 线程优先级映射到宿主平台
+            的优先级上，优先级也许更多，也许更少。
+            Windows 有7个优先级。有的平台线程优先级忽略。不要将程序构建的功能正确性依赖于优先级。
+            
+            java.lang.Thread:
+                void setPriority(int newPriority); 设置优先级。
+                static void yield(); 导致当前执行线程处于让步状态，如果其他线程可运行线程具体至少与此线程
+                                     同样高的优先级，那么这些线程接下来会被调度。这是一个静态方法。
+
+        2、守护线程：
+            
+            t.setDaemon(ture); 将线程转换为守护线程（daemon thread）
+            守护线程的唯一用途是为其他线程提供服务。例如它定时发送"计时器嘀嗒"信号给其他线程。
+            当只剩下守护线程时，虚拟机就退出了，如果只剩下守护线程，就没有必要继续运行程序。
+            守护线程永远不去访问固有资源：文件、数据库。
+            
+            Java.lang.Thread
+                void setDaemon(boolean isDaemon); 标识该线程为守护线程或用户线程，方法必须在线程启动前调用。
+
+        3、未捕获异常处理器：
+
+            线程当 run 方法不能排除任何受查异常，但是，非受查异常会导致线程终止。在这种情况下，线程就死亡了。
+            但是，不需要任何 catch 子句来处理被传播当异常。相反，在线程死亡之前，异常被传递到一个用未捕获异常的处理器。
+            
+            该处理器必须属于一个实现 Thread.UncaughtExceptionHandler 接口的类。
+
+    14.5 同步：
+
+            
+
+        3、
+                
+             
+    
+        
+
+
         
     
         
