@@ -799,11 +799,68 @@
             该处理器必须属于一个实现 Thread.UncaughtExceptionHandler 接口的类。
 
     14.5 同步：
+        
+        锁对象：有两种机制防止代码块受并发访问的干扰。synchronized关键字。Java5 引入 ReentrantLock类。
+                Java.until.concurrent 框架为这些基础机制提供独立的类。
+
+            用 ReentrantLock 保护代码块的基础结构如下：
+                myLock.lock(); // a ReentrantLock object
+                try{
+                    // critical section
+                }finally{
+                    mylock.unlock(); // make sure the lock is unlocked even if an exception is throw 
+                }
+            这个接口确保任何时刻只有一个线程进入临界区，一旦一个线程封锁类锁对象，其他任何线程都无法通过 lock语句。
+            当其他线程调用 lock 时，会被阻塞，直到线程是释放锁对象。
+
+            java.util.concurrent.locks.Lock 5.0
+                void lock(); 获取这个锁，如果锁同时被另一个线程拥有则发生阻塞
+                void unlock(); 释放这个锁
+
+            Java.util.concurrent.locks.ReentrantLock 5.0
+                ReentrantLock(); 构建一个可重入锁
+
+        条件对象（被称为条件变量）：
+            通常，线程进入临界区，却发现在某一条件满足之后它才能执行。要使用一个条件对象来管理那些已经
+            获得了一个锁但是却不能做有用工作都线程。
+
+            一个锁对象可以有一个或多个相关都条件对象。可以用newCondition方法获得一个条件对象。
+            例如设置一个"余额充足"条件：
+                class Bank{
+                    private Condition sufficientFunds;
+                    ...
+                    public Bank(){
+                        ...
+                        sufficientFunds = bankLock.newConndition();
+                    }
+                }                
+            如果 transfer 方法发现余额不足，它调用 sufficientFunds.await();
+            当前线程现在被阻塞来，并放弃来锁。希望另一个线程增加余额。
+            等待获得锁都线程和调用 await 方法都线程存在本质上都不同。
+            一旦一个线程调用 await 方法，它进入该条件都等待集。当锁可用时，该线程不能马上解除阻塞。
+            相反，它处于阻塞状态，直到另一个线程调用同一个条件上的 signalAll 方法时为止。
+            当另一个线程转账时，它应该调用：sufficientFunds.signalAll();
+            调用重新激活因为这一条件而等待当所有线程。线程从等待集中移出，再次成为可运行状态，调度器再次激活它们。
+            一旦锁可以，获得锁并从被阻塞当地方继续执行。
+
+            至关重要当最终需要某个其他线程调用 signalAll 方法。当一个线程调用 await 时，它没有办法重新激活自身。
+            寄希望其他线程，如果没有其他线程，它永远无法运行，导致死锁现象。
+
+            何时调用 signalAll,在对象当状态有利于等待线程当方向改变时调用 signalAll。
+            调用 signalALl 不会立刻激活一个等待线程。它仅仅解除等待线程当阻塞，以便线程
+            可以在当前线程退出同步方法之后，通告竞争实现对象的访问。
+            
+            
+        
 
             
+            
+            
 
-        3、
+
                 
+        
+        
              
     
         
