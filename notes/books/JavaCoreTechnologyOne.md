@@ -800,7 +800,7 @@
 
     14.5 同步：
         
-        锁对象：有两种机制防止代码块受并发访问的干扰。synchronized关键字。Java5 引入 ReentrantLock类。
+        1、锁对象：有两种机制防止代码块受并发访问的干扰。synchronized关键字。Java5 引入 ReentrantLock类。
                 Java.until.concurrent 框架为这些基础机制提供独立的类。
 
             用 ReentrantLock 保护代码块的基础结构如下：
@@ -820,7 +820,7 @@
             Java.util.concurrent.locks.ReentrantLock 5.0
                 ReentrantLock(); 构建一个可重入锁
 
-        条件对象（被称为条件变量）：
+        2、条件对象（被称为条件变量）：
             通常，线程进入临界区，却发现在某一条件满足之后它才能执行。要使用一个条件对象来管理那些已经
             获得了一个锁但是却不能做有用工作都线程。
 
@@ -849,6 +849,226 @@
             何时调用 signalAll,在对象当状态有利于等待线程当方向改变时调用 signalAll。
             调用 signalALl 不会立刻激活一个等待线程。它仅仅解除等待线程当阻塞，以便线程
             可以在当前线程退出同步方法之后，通告竞争实现对象的访问。
+            
+            java.util.concurrent.locks.Lock:
+                Condition newCondition(); 返回一个与该锁相关的条件对象
+           java.util.concurrent.locks.Condition
+                void await(); 将该线程放到条件的等待集中
+                void signalAll(); 解除等待集中所有线程的阻塞状态
+                void signal(); 从该条件的等待集中随机地选择一个线程，解除其阻塞状态。
+
+        3、synchronized 关键字：
+            锁与条件的关键之处：
+                锁用来保护代码片段，任何时刻只能有一个线程执行被保护的代码
+                锁可以管理试图进入保护代码段的线程
+                锁可以拥有一个或多个相关的条件对象
+                每个条件对象管理那些已经进入保护的代码段但不能运行的线程。
+
+            从1.0开始，Java 中的每一个对象都有一个内部锁。如果一个方法用synchronized关键字声明
+            那么对象的锁将保护整个方法。调用该方法，线程必须获得内部的对象锁。
+
+                public synchronized void method(){
+                    method body
+                }
+            等价于
+                public void method(){
+                    this.intrinsicLock.lock();
+                    try{
+                        method body
+                    }
+                    finally{
+                        this.intrinsicLock.unlock();
+                    }
+                }
+            
+            内部锁对象锁只有一个相关条件，wait方法添加一个线程到等待集中，notifyAll/nofify方法解除等待线程的阻塞状态。
+            调用wait或notifyAll等价于：
+                intrinsicCondition.await();
+                intrinsicCondition.signalAll();
+            
+            wait、notifyAll、notify 方法是Object类的 final 方法。
+            Condition 方法必须被命名为 await、signalALL和signal 以便不会与那些方法发生冲突。
+            
+            内部锁和条件存在一些局限：
+                不能中断一个正在试图获得锁的线程
+                试图获得锁时不能设定超时
+                每个锁仅有单一的条件，不可能是不够的
+
+            在代码中应该使用那种？Lock 和 Condition对象还是同步方法？建议：
+                1、最好既不使用 Lock/Condition 也不使用 synchronized 关键字。
+                    可以使用Java.until.concurrent包的一种机制，它会为类处理所有的加锁。
+                2、如果synchronized 关键字适合你的程序，那么请尽量使用它，可以减少代码量。
+                3、如果特别需要 Lock/Condition 结构提供的独有特性时，才使用Lock/Condition.
+
+            java.lang.Object:
+                void notifyAll(); 解除该对象上调用wait方法的线程的阻塞状态。该方法只能在同步方法或同步块内调用。
+                void notify(); 随机选择一个
+                void wait(); 导致该线程进入等待状态直到它被通知。该方法只能在同步方法中调用。
+                void wait(long millis);
+                void wait(long millis, int nanos);
+
+        4、同步阻塞：
+            每个 Java 对象有一个锁，线程可以通过调用同步方法获得锁。
+            还有另一种机制可以获得锁，通过进入一个同步阻塞。当线程进入如下形式当阻塞：
+                synchronized(obj){  // this is the syntax for a synchronized block
+                    critical section
+                }
+            于是它获得 obj 当锁。
+
+            public calss Bank{
+                private double[] accounts;
+                private Object lock = new Object();
+                ....
+                public void transfer(int from, int to, int amount){
+                    synchronized(lock){  // an ad-hoc lock
+                        accounts[from] -= amount;
+                        accounts[to] += amount;
+                    }
+                    System.out.println(...);
+                }
+            }
+            在此，lock 对象被创建仅仅是用来使用每个 java 对象持有当锁。
+            使用一个对象当锁来实现额外当原子操作，称为客户端锁定。客户端锁定非常脆弱，不推荐使用。
+
+        5、监视器概念：
+            锁和条件是线程同步当强大工具，但是，严格来说，它们不是面向对象当。
+            努力寻找一种方法，可以不需要程序员考虑如果加锁当情况下，可以保证线程当安全性。
+            最成功当解决方案之一--监视器。用Java的术语讲，监视器具有如下特性：
+                a、监视器是只包含私有域的类。
+                b、每个监视器类的对象有一个相关的锁。
+                c、使用该锁对所有对方法进行加锁。换句话说，如果客户端调用obj.mehtod(),
+                    那么obj对象对锁是在方法调用开始时自动获得，当方法返回时自动释放该锁。
+                    因为所有域都是私有的，保证一个线程在对对象操作时，没有其他线程能访问该域。
+                d、该锁可以有任意多个相关条件。
+        
+        6、Volatile 域：
+            仅仅写一个两个实例域使用同步，显得开销过大，比较，什么地方能出错呢？遗憾对是，使用
+            现代处理器和编译器，出错的可能性很大。
+                多处理器的计算机能够暂时在寄存器或本地内存缓冲区中保存内存中的值。
+                结果是，运行在不同处理器上的线程可能在同一个内存位置取到不同的值。
+
+                编译器可以改变指令的执行的顺序以使吞吐量最大化。这种顺序上的变化不会
+                改变代码语义，但是编译器假定内存的值仅仅在代码中有显式的修改指令时才会改变。
+                然而，内存的值可以被另一个线程改变。
+
+            如果你使用锁来保护被多个线程访问的代码，可以不用考虑这种问题，编译器被要求通过
+            在必要的适合刷新本地缓存来保持锁的效应，并且不能不正当地重新排序指令。
+
+            同步格言：如果向一个变量写入值，而这个变量接下来可能被另一个线程读取，或者，从一个
+                    变量读值，而这个变量可能是之前被另一个线程写入的。此时必须使用同步。
+
+            volatile 关键字为实例域的同步访问提供来一种免锁机制。如果声明一个域为 volatile
+            那么编译器和虚拟机就知道该域是可能被另一个线程并发更新的。
+
+            假定一个对象的布尔标记done,它的值被一个线程设置却被另一个线程查询。你可以同步锁
+                private boolean done;
+                public synchronized boolean isDone(){return done;}
+                public synchronized void setDone(){done = true;}
+                内部锁不是一个好主意，方法可能阻塞。
+                
+                这种情况，可以将域声明为 volatile 是合理的。
+                private volatile boolean done;
+                public boolean isDone(){return done;}
+                public void setDone(done = true;)
+            
+            volatiole 变量不能提供原子性。
+        
+        7、final 变量：
+            除非使用锁或 volatile 修饰符，否则无法从多个线程安全读取一个域。
+            还有一种情况可以安全地访问一个共享域，即这个域声明为 final时：
+            final Map<String, Double> accounts = new HashMap<>();
+            其他线程会在构造函数完成构造之后才能看的这个accounts 变量。
+            
+            如果不使用 final，就不能保证其他线程看的的accounts更新后的值，它们看能都只是看的null，
+            而不是构造的HashMap。
+
+            当然，对这个映射表对操作并不是线程安全对。如果多个线程写这个映射表，仍需要同步。
+
+        8、原子性：
+
+            假设对共享变量除了赋值之外并不完成其他操作，那么可以将这些共享变量声明为 volatile.
+            java.util.concurrent.atomic包中有很多类使用类很高效对机器级指令来保证其他操作对
+            原子性。例如，AtomicInteger类提供类方法incrementAndGet 和 decrementAndGet.
+            它们分别以原子方式将一个整数自增或自减。
+                public static AtomicLong nextNumber = new AtomicLong();
+                long id = nextNumber.incrementAndGet();
+
+        9、死锁：
+            锁和条件不能解决多线程中对所有问题。
+
+        10、线程局部变量：
+            在线程间共享变量有风险，又是可能要避免共享变量。使用ThreadLocal 辅助类为各个线程提供各自对实例。
+            public static final ThreadLocal<SimpleDateFormat> dateFormat = 
+                ThreadLocal.withInitial(()->new SimpleDateFormat("yyyy-MM-dd"));
+
+            具体访问格式化：
+                String dateStamp = dateFormat.get().format(new Date());
+            在一个给定线程中首次调用get时，会调用 initialValue方法。之后，get方法会返回属于当前线程对那个实例。
+
+
+            java.lang.ThreadLocal<T>:
+                T get(); 得到这个线程对当前值，如果是首次调用get,会调用initialize来得到这个值。
+                protected initialize(); 应覆盖这个方法来提供一个初始值。默认情况下，返回null.
+                void set(T t); 为这个线程设置一个新值。
+                void remove(); 删除对应这个线程对值。
+                static <S> ThreadLocal<S> withInitial(Supplier<? extends S> supper);
+                    创建一个线程局部变量，其初始值通过调用给定的supplier生成。
+        
+        11、锁测试与超时：
+            线程在调用 lock方法来获取另一线程所持有的锁的时候，可能发生阻塞。应更谨慎申请锁。
+            tryLock方法试图申请一个锁，成功返回true，否则，立刻返回 false。线程可以去做其他事。
+
+            if(myLock.tryLock()){
+                try{...}
+                finally {myLock.unlock();}
+            }else{
+                // do something else
+            }
+
+            可以调用 tryLock时，使用超时参数。
+            if(myLock.tryLock(100, TimeUnit.MILLISECONDS))
+
+            lock 方法不能被中断，如果一个线程在等待获得一个锁时被中断，中断线程在获得锁之前一直
+            处于阻塞状态，如果出现死锁，那么 lock方法无法终止。
+
+            调用带有超时参数的 tryLock,那么如果线程在等待期间被中断，将抛出InterruptedException异常。
+            
+            boolean tryLock();
+            boolean tryLock(long time, TimeUtil unit);
+            void lockInterruptibly();
+        
+        12、读写锁：
+            java.util.concurrent.locks 定义来两个锁类，ReentrantLock类和RenntrantReadWriteLock类。
+            
+            使用读/写锁的必要步骤：
+                1、构造一个 RenntrantReadWriteLock对象；
+                    private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+                2、抽取读锁和写锁：
+                    private Lock readLock = rwl.readLock();
+                    private Lock writeLock = rwl.writeLock();
+                3、所有读取的方法加读锁
+                    public double getTotalBalance(){
+                        readLock.lock();
+                        try{...}
+                        finally(readLock.unlock())
+                    }
+                4、所有修改方法加写锁：
+                    public void transfer(...){
+                        writeLock.lock();
+                        try{...}
+                        finally(writeLock.unlock())
+                    }
+
+            java.util.concurrent.locks.ReentrantReadWriteLock
+                Lock readLock();多个读操作共用的读锁，但排斥写操作
+                Lock writeLock(); 写锁，排斥所有读写操作。
+
+
+    14.6 阻塞队列：
+
+        
+            
+                
             
             
         
