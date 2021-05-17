@@ -1093,6 +1093,12 @@
             ConcurrentHashMap、ConcurrentSkipListMap、ConcurrentSkipListSet和ConcurrentLinkedQueue. 
         这些集合使用复杂当算法，通过允许并发地访问数据机构当不同部分来使竞争极小化。
 
+        任何集合都可以通过使用 同步包装器变成线程安全的：
+            List<E> synchArrayList = Collections.synchronziedList(new ArrayList<E>);
+            Map<K, V>synchHashMap = Collections.synchronziedMap(new HashMap<K, V>);
+
+    14.8 Callable 与 Future：
+        
         
 
 
