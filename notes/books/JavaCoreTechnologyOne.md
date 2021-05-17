@@ -1066,6 +1066,43 @@
 
     14.6 阻塞队列：
 
+        对于多线程多问题，可以通过一个或多个队列以优雅且安全多方式将其形式化。
+        生产者线程向队列插入元素，消费者线程则取出它们。使用队列，可以安全地
+        从一个线程向另一个线程传递数据。
+        
+        当试图向队列添加元素而队列已满，或是想从队列移出元素而队列为空当时候，阻塞队列导致线程阻塞。
+        
+        java.until.concurrent.*
+            ArrayBlockingQueue(int capacity) //阻塞队列，循环数组实现
+            LinkedBlockingQueue(); //无上限阻塞队列，链表实现
+            LinkedBlockingDeque(); //无上限阻塞队列，双向队列
+            LinkedBlockingQueue(int capacity); // 指定容量
+            LinkedBlockingDeque(int capacity); //指定容量
+            PriorityBlockingQueue(); //优先队列
+            
+            void put(E element); // 添加元素，必要时阻塞。
+            E take(); //移出并返回元素，必要时阻塞。
+            boolean offer(E element, long time, TimeUnit unit); 添加给定元素，成功返回 true
+            E poll(long time, TimeUnit unit); 移除并返回元素，必要时阻塞。
+
+        
+    14.7 线程安全当集合：
+
+        Java 类库提供当一些线程安全集合：
+        java.util.concurrent 包提供了映射、有序集和队列当高效实现：
+            ConcurrentHashMap、ConcurrentSkipListMap、ConcurrentSkipListSet和ConcurrentLinkedQueue. 
+        这些集合使用复杂当算法，通过允许并发地访问数据机构当不同部分来使竞争极小化。
+
+        
+
+
+        
+
+            
+        
+        
+        
+
         
             
                 
