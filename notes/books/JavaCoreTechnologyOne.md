@@ -818,7 +818,7 @@
                 void unlock(); 释放这个锁
 
             Java.util.concurrent.locks.ReentrantLock 5.0
-                ReentrantLock(); 构建一个可重入锁
+                ReentrantLock(); 构建一个可重入 锁
 
         2、条件对象（被称为条件变量）：
             通常，线程进入临界区，却发现在某一条件满足之后它才能执行。要使用一个条件对象来管理那些已经
@@ -1063,32 +1063,8 @@
                 Lock readLock();多个读操作共用的读锁，但排斥写操作
                 Lock writeLock(); 写锁，排斥所有读写操作。
 
-
-
+    14.6 阻塞队列    
         
-    14.8 Callable 与 Future:
-    
-        Runnable 封装一个异步运行的任务，可以把它想象成为一个没有参数和返回值的异步方法。
-        Callable 与 Runnable 类似，但是有返回值。Callable 接口是一个参数化的类型。只有一个方法 call。
-            
-            public interface Callable<V>{
-                V call() throw Exception;
-            }
-        
-        类型参数是返回值的类型。例如，Callable<Interger> 表示一个最终返回 Integer对象的异步计算。
-        Future 保存异步计算的结果。可以启动一个计算，将 Future 对象交给某个线程，然后忘掉它。
-        Future 对象的所有者在结果计算好之后就可以获得它。
-        
-        Future 接口具有下面的方法:
-            public interface Future<V>{
-                V get() throw ...;  // 计算未完成被阻塞;计算线程中断将抛 InterruptedException;计算完成立刻返回。  
-                V get(long timeout, TimeUnit unit) throw ...; // 计算未完成超时抛出 TimeoutException异常;计算线程中断将抛 InterruptedException;计算完成立刻返回。
-                void cancel(boolean mayInterrupt);
-                boolean isCancelled();
-                boolean isDone();
-            }
-                      
-
         对于多线程多问题，可以通过一个或多个队列以优雅且安全多方式将其形式化。
         生产者线程向队列插入元素，消费者线程则取出它们。使用队列，可以安全地
         从一个线程向另一个线程传递数据。
@@ -1121,6 +1097,29 @@
             Map<K, V>synchHashMap = Collections.synchronziedMap(new HashMap<K, V>);
 
     14.8 Callable 与 Future：
+
+        Runnable 封装一个异步运行的任务，可以把它想象成为一个没有参数和返回值的异步方法。
+        Callable 与 Runnable 类似，但是有返回值。Callable 接口是一个参数化的类型。只有一个方法 call。
+            
+            public interface Callable<V>{
+                V call() throw Exception;
+            }
+        
+        类型参数是返回值的类型。例如，Callable<Interger> 表示一个最终返回 Integer对象的异步计算。
+        Future 保存异步计算的结果。可以启动一个计算，将 Future 对象交给某个线程，然后忘掉它。
+        Future 对象的所有者在结果计算好之后就可以获得它。
+        
+        Future 接口具有下面的方法:
+            public interface Future<V>{
+                V get() throw ...;  // 计算未完成被阻塞;计算线程中断将抛 InterruptedException;计算完成立刻返回。  
+                V get(long timeout, TimeUnit unit) throw ...; // 计算未完成超时抛出 TimeoutException异常;计算线程中断将抛 InterruptedException;计算完成立刻返回。
+                void cancel(boolean mayInterrupt);
+                boolean isCancelled();
+                boolean isDone();
+            }
+                      
+
+
         
         
 
