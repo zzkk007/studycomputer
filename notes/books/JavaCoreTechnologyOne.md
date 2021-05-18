@@ -1113,11 +1113,21 @@
             public interface Future<V>{
                 V get() throw ...;  // 计算未完成被阻塞;计算线程中断将抛 InterruptedException;计算完成立刻返回。  
                 V get(long timeout, TimeUnit unit) throw ...; // 计算未完成超时抛出 TimeoutException异常;计算线程中断将抛 InterruptedException;计算完成立刻返回。
-                void cancel(boolean mayInterrupt);
-                boolean isCancelled();
-                boolean isDone();
+                void cancel(boolean mayInterrupt); //如果计算还没有开始，它被取消且不在开始，如果计算运行中，mayInterrupt为ture,它被中断。
+                boolean isCancelled(); //如果任务完成前被取消了，则返回 true
+                boolean isDone(); // 如果任务结束，无论正常结束、中途取消、发生异常，都返回 true。
             }
-                      
+
+        FutureTask 包装器是一种非常便利的机制，可将 Callable 转化成 Future 和 Runnable,它同时实现二者接口。
+            Callable<Interger> myComputation = ...;
+            FutureTask<Integer> task = new FutureTask<Integer>(myComputation);
+            Thread t = new Thread(task);
+            t.stat();
+            ....
+            Integer result = task.get(); 
+    
+    14.9 执行器：
+        
 
 
         
