@@ -1126,9 +1126,40 @@
             ....
             Integer result = task.get(); 
     
-    14.9 执行器：
+    14.9 执行器:
         
-
+        构建一个新的线程是有一定代价的，因为涉及与操作系统交互。如果程序中创建了大量的生命期很短的线程，应该使用线程池。
+        一个线程池中包含许多准备运行的空闲线程。将 Runnable 对象交给线程池，就会有一个线程调用 run 方法。当 run 方法
+        退出时，线程不会死亡，而是在池中准备下一个请求提供服务。
+        另一个使用线程池的理由是减少并发线程的数目。创建大量线程会大大降低性能甚至使虚拟机崩溃，线程池限制并发线程数量。
+        
+        执行器(Executor)类有许多静态工厂方法用来建构线程池。
+            newCachedThreadPool    必要时创建新线程，空闲线程会被保留 60 秒
+            newFixedThreadPool     该池包含固定数量的线程，空闲线程会一直保留
+            
+        使用线程池应该做的事：
+            1、调用 Executors 类中静态的方法 newCachedThreadPool或newFixedThreadPool。
+            2、调用 submit 提交 Runnable 或 Callable 对象
+            3、如果想取消一个任务，或如果提交 Callable 对象，那就要保存返回 Future 对象。
+            4、当不再提交任何任务时，调用 shutdown。
+            
+        java.util.concurrent.Executors:
+            ExecutorService newCachedThreadPool();
+                返回一个带缓存的线程池，该池在必要的时候创建线程，在线程空闲60秒之后终止线程。
+            ExecutorService newFixedThreadPool(int threads);
+                返回要给线程池，该池中的线程数由参数指定
+            ExecutorService newSingleThreadExecutor();
+                返回一个执行器，它在一个单个的线程中依次执行各个任务。
+                           
+        java.util.concurrent.ExecutorServices:
+            
+            Future<T> submit(Callable<T> task)
+            Future<T> submit(Runnable task, T result)
+            Future<?> submit(Runnable task)
+                提交指定的任务去执行
+            void sutdown();
+                关闭服务,会先完成已经提交的任务而不再接收新的任务。
+        
 
         
         
