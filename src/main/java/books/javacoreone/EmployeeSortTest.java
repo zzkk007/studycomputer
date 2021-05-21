@@ -19,5 +19,13 @@ public class EmployeeSortTest {
         for (int i = 0; i < staff.length; i++) {
             System.out.println("name=" + staff[i].getName() + ", salary" + staff[i].getSalary());
         }
+
+        for (Employee e : staff){
+            e.raiseSalary(10);
+        }
+
+        for (Employee e : staff) {
+            System.out.println("name = " + e.getName() + "salary" + e.getSalary());
+        }
     }
 }
