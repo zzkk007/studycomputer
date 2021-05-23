@@ -27,7 +27,52 @@
             产生当前集合中所有元素的顺序流或并行流。
 
     流的创建：
+        Collection 接口的 stream 方法将任何集合转换为一个流。
+        如果有一个数组，可以使用静态的 Stream.of() 方法。of方法具有可变长参数，因此我们可以构建具有任意数量引元的流。
+            Stream<String> words = Stream.of(content.split("\\PL+")); 
+            
+            Array.stream(array, from, to)可以从数组中位于 from(包含)和to(不包含)的元素中创建一个流。
+            Stream.empty() 创建不包含任何元素的流。
+
+        Stream 接口中有两个用于创建无限流的静态方法：
+            generate()方法会接受一个不包含任何引元的函数。
+                Stream<String> echos = Stream.generate(() - > "Echo"); 获得一个常量流。
+                Stream<Double> randoms = Stream.generate(Math::random); 获取一个随机数流。
+            
+            iterate()方法，它接受一个"种子"值 和一个函数，并且反复地将该函数应用到之前的结果上。
+                Stream<BigInteger> integers = Stream.iterate(BigInteger.ZERO, n -> n.add(BigInteger.ONE));
+                该序列第一个元素的种子 BigInteger.ZERO, 第二个元素是 f(seed),下一个元素是 f(f(seed)),类推。
+
+        java.util.stream.Stream 8:
+            static <T> Stream<T> of(T... values); 产生一个元素为给定值的流
+            static <T> Stream<T> empty(); 产生一个不包含任何元素的流
+            static <T> Stream<T> generate(Supplier<T> s); 产生一个无限流，它的值通过反复调用函数 s 而创建。
+            static <T> Stream<T> iterate(T seed, UnaryOperator<T> f); 产生一个无限流，它的元素包含种子，中种子上调用f产生值。
+
+        java.util.Arrays 1.2:
+            static <T> Stream<T> stream(T[] array, int startInclusive, int endExclusive);
+            产生一个流，它的元素有数组指定范围内的元素构造
         
+        java.util.regex.Pattern 1.4
+            Stream<String> splitAsStream(CharSequence input);
+            产生一个流，它的元素是输入中由该模式界定的部分。
+
+        java.nio.file.Files 7:
+            static Steam<String> lines(path path); 8
+            static Steam<String> lines(Path path, Charset cs); 8
+            产生一个流，它的元素是指定文件中的行，该文件的字符集为 UTF-8
+
+        java.util.function.Supplier<T> 8
+            T get(); 提供一个值。
+
+    filter、map 和 flatMap 方法：
+
+        filter 转换会产生一个流，它的元素与某种条件相匹配。
+        filter 的引元是 predicate<T>, 即从 T 到 boolean 的函数。
+
+            
+                
+    
 
         
         
