@@ -69,6 +69,26 @@
 
         filter 转换会产生一个流，它的元素与某种条件相匹配。
         filter 的引元是 predicate<T>, 即从 T 到 boolean 的函数。
+        map 会有一个函数应用到每个元素上，并且其结果是包含流应用该函数后所产生的多有结果的流。
+        
+        Stream<T> filter(Predicate<? super T> predicate);  
+            产生一个流，它包含当前流中所有满足断言条件的元素。
+        <R> Stream<R> map(Function<? super T, ? extends R> mapper);
+            产生一个流，它包含将mapper 应用于当前流中所有元素锁产生的结果。
+        <R> Stream<R> flatMap(Function<? super T, ? extends Steam<? extends R>> mapper)
+            产生一流，它是通过将mapper应用于当前流中所产生的结果拼接到一起而获得的。
+
+    抽取子流和链接流：
+        Stream.limit(n) 会返回一个新的流，它在 n 元素之后结束。剪切无限流。
+        Stream<Double> randoms = Stream.generate(Math::random).limit(100);
+        Stream.skip(n) 正好相反，它会丢弃前 n 个元素。
+        Stream.concat() 方法将两个流连起来。
+
+        Stream<String> combined = Stream.concat(letters("Hello"), letters("World"));
+
+
+        
+
 
             
                 
