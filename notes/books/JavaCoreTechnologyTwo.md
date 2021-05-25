@@ -86,7 +86,9 @@
 
         Stream<String> combined = Stream.concat(letters("Hello"), letters("World"));
 
-
+    其他的流转换:
+        distinct 方法会返回一个无重复数据的流。
+        Stream<String> uniqueWords = Stream.of("merrily","merrily","gently","merrily").distinct();
         
 
 
