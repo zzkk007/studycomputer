@@ -85,10 +85,19 @@
         Stream.concat() 方法将两个流连起来。
 
         Stream<String> combined = Stream.concat(letters("Hello"), letters("World"));
-
-
         
-
+        Stream<T> distinct();   产生一个流，包含当前所有不同的元素
+        
+        Stream<T> sorted();
+        Stream<T> sorted(Comparator<? super T> comparator);
+            产生一个流是当前流中的所有元素按照顺序排序的；
+    
+    简单约简：
+        
+        约简是一种终结操作，它们会将流约简为可以中程序中使用的非流值。
+        java.util.stream.Stream 8 
+        Optional<T> max(Comparator<? super T>)
+        
 
             
                 
