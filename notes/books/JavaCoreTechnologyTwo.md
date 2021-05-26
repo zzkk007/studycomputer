@@ -137,9 +137,23 @@
             
                 
     
-
-   
 ## 第二章 输入与输出
+    
+    抽象类 InputSteam 和 OutputStream 构成了输入/输出(I/O)类层次结构的基础。
+    Reader/Writer 中继承了专门用于处理 Unicode 字符的单独的类层次结构。
+    这些类拥有的读入和写出操作都是基于两个字节的Char值而不是基于byte值。
+  
+    输入/输出流:
+        InputStream 类有一个抽象方法:
+            abstract int read(); 读入一个字节，并返回读入的字节，或者遇到输入源结尾时返回 -1。
+        
+        OutputStream 类有一个抽象方法:
+            abstract void write(int b); 向某个输出位置写一个字节。
+        
+        read和write 方法在执行时都将阻塞，直至字节确实被读入或写出。
+          
+
+
 
 ## 第三章 xml
 				
