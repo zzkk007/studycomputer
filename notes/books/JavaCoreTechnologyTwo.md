@@ -109,7 +109,18 @@
         Optional<T> 对象时一种包装器对象，要么包装了类型T的对象，要么没有包装任何对象。  
                                
     收集结果:
-                      
+        当处理完流之后，查看其元素。
+        调用 iterator 方法，产生可以用来访问元素的迭代器。
+        调用 forEach 方法，将某个函数应用于每个元素。
+        调用 toArray 获得由流的元素构成的数组。
+        调用 collect 将流的元素收集到另一个目标中。Collectors 类提供了大量用于生产公共收集器的工厂方法。
+        调用 getCount() 产生汇总后的元素的个数
+        调用 (int|long|double) getSum(); 汇总元素总和
+        调用 double getAverage(); 汇总元素平均数。
+        调用 (int|long|duble); getMax(); 元素最大数。
+        调用 (int|long|doubel); getMin(); 元素最小数。
+    
+                    
             
 
             
