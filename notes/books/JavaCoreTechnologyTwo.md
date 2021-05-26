@@ -90,7 +90,27 @@
         distinct 方法会返回一个无重复数据的流。
         Stream<String> uniqueWords = Stream.of("merrily","merrily","gently","merrily").distinct();
         
+    简单约简:
+        约简是一种终结操作，将流约简为可以在程序中使用的非流值。返回类型是Optional<T>值。
+        
+        Optional<T> max(Comparator<? super T> comparator);
+        Optional<T> min(Comparator<? super T> comparator);
+            分别产生这个流的最大元素和最小元素，使用由给定比较器定义的排序规则，如果这个流为空，会产生一个Optioal对象。终止操作。
+        Optional<T> findFirst();
+        Optional<T> findAny();
+            分别产生这个流的第一个和任意一个元素，如果这个流为空，会产生一个空的Optional对象。这些操作都是终结操作。
+        
+        boolean anyMatch(Predicate<? super T> predicate)
+        boolean allMatch(Predicate<? super T> predicate)
+        boolean noneMatch(Predicate<? super T> predicate)
+            分别在这个流中任意元素、所有元素和没有任何元素匹配给定断言时返回 true。这些操作都是终结操作。
 
+    Optional 类型:
+        Optional<T> 对象时一种包装器对象，要么包装了类型T的对象，要么没有包装任何对象。  
+                               
+    收集结果:
+                      
+            
 
             
                 
