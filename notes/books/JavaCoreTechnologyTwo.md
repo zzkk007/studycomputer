@@ -120,19 +120,25 @@
         调用 (int|long|duble); getMax(); 元素最大数。
         调用 (int|long|doubel); getMin(); 元素最小数。
     
-                    
-            
-
+     约简操作:      
+        reduce 方法是一种用于从流中计算某个值的通用机制，其他最简单的形式将接受一个二元函数，并从前两个元素开始
+        持续应用它。如果该函数是求和函数，那么很容易解释这种机制:
+            List<Integer> values = ...;
+            Optional<Integer> sum = values.stream.stream().reduce((x, y) -> x + y) 
+            reduce方法会计算 v0 + v1 + v2 + ...,其中 vi 是流中的元素。         
+    
+    基本类型流:
+        流库中具有专门的类型 IntStream、LongStream、DoubleStream用来直接存储基本类型数值。
+                 
+    并行流:
+        S parallel(); 产生一个与当前元素相同的并行流
+        
+        Stream<E> parallelSteram(); 用于当期集合中产生一个并行流
             
                 
     
 
-        
-        
-
-
-
-
+   
 ## 第二章 输入与输出
 
 ## 第三章 xml
