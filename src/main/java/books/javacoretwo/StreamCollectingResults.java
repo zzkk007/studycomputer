@@ -44,11 +44,6 @@ public class StreamCollectingResults {
         TreeSet<String> streamTreeSet = worldList.stream().collect(Collectors.toCollection(TreeSet::new));
         show("streamTreeSet", streamTreeSet);
 
-
-
-
-
-
     }
 
 
