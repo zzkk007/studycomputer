@@ -85,19 +85,43 @@
         Stream.concat() 方法将两个流连起来。
 
         Stream<String> combined = Stream.concat(letters("Hello"), letters("World"));
+
+    其他的流转换:
+        distinct 方法会返回一个无重复数据的流。
+        Stream<String> uniqueWords = Stream.of("merrily","merrily","gently","merrily").distinct();
         
-        Stream<T> distinct();   产生一个流，包含当前所有不同的元素
+    简单约简:
+        约简是一种终结操作，将流约简为可以在程序中使用的非流值。返回类型是Optional<T>值。
         
-        Stream<T> sorted();
-        Stream<T> sorted(Comparator<? super T> comparator);
-            产生一个流是当前流中的所有元素按照顺序排序的；
+        Optional<T> max(Comparator<? super T> comparator);
+        Optional<T> min(Comparator<? super T> comparator);
+            分别产生这个流的最大元素和最小元素，使用由给定比较器定义的排序规则，如果这个流为空，会产生一个Optioal对象。终止操作。
+        Optional<T> findFirst();
+        Optional<T> findAny();
+            分别产生这个流的第一个和任意一个元素，如果这个流为空，会产生一个空的Optional对象。这些操作都是终结操作。
+        
+        boolean anyMatch(Predicate<? super T> predicate)
+        boolean allMatch(Predicate<? super T> predicate)
+        boolean noneMatch(Predicate<? super T> predicate)
+            分别在这个流中任意元素、所有元素和没有任何元素匹配给定断言时返回 true。这些操作都是终结操作。
+
+    Optional 类型:
+        Optional<T> 对象时一种包装器对象，要么包装了类型T的对象，要么没有包装任何对象。  
+                               
+    收集结果:
+        当处理完流之后，查看其元素。
+        调用 iterator 方法，产生可以用来访问元素的迭代器。
+        调用 forEach 方法，将某个函数应用于每个元素。
+        调用 toArray 获得由流的元素构成的数组。
+        调用 collect 将流的元素收集到另一个目标中。Collectors 类提供了大量用于生产公共收集器的工厂方法。
+        调用 getCount() 产生汇总后的元素的个数
+        调用 (int|long|double) getSum(); 汇总元素总和
+        调用 double getAverage(); 汇总元素平均数。
+        调用 (int|long|duble); getMax(); 元素最大数。
+        调用 (int|long|doubel); getMin(); 元素最小数。
     
-    简单约简：
-        
-        约简是一种终结操作，它们会将流约简为可以中程序中使用的非流值。
-        java.util.stream.Stream 8 
-        Optional<T> max(Comparator<? super T>)
-        
+                    
+            
 
             
                 
