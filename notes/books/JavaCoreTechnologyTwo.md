@@ -120,20 +120,40 @@
         调用 (int|long|duble); getMax(); 元素最大数。
         调用 (int|long|doubel); getMin(); 元素最小数。
     
-                    
-            
-
+     约简操作:      
+        reduce 方法是一种用于从流中计算某个值的通用机制，其他最简单的形式将接受一个二元函数，并从前两个元素开始
+        持续应用它。如果该函数是求和函数，那么很容易解释这种机制:
+            List<Integer> values = ...;
+            Optional<Integer> sum = values.stream.stream().reduce((x, y) -> x + y) 
+            reduce方法会计算 v0 + v1 + v2 + ...,其中 vi 是流中的元素。         
+    
+    基本类型流:
+        流库中具有专门的类型 IntStream、LongStream、DoubleStream用来直接存储基本类型数值。
+                 
+    并行流:
+        S parallel(); 产生一个与当前元素相同的并行流
+        
+        Stream<E> parallelSteram(); 用于当期集合中产生一个并行流
             
                 
     
-
-        
-        
-
-
-
-
 ## 第二章 输入与输出
+    
+    抽象类 InputSteam 和 OutputStream 构成了输入/输出(I/O)类层次结构的基础。
+    Reader/Writer 中继承了专门用于处理 Unicode 字符的单独的类层次结构。
+    这些类拥有的读入和写出操作都是基于两个字节的Char值而不是基于byte值。
+  
+    输入/输出流:
+        InputStream 类有一个抽象方法:
+            abstract int read(); 读入一个字节，并返回读入的字节，或者遇到输入源结尾时返回 -1。
+        
+        OutputStream 类有一个抽象方法:
+            abstract void write(int b); 向某个输出位置写一个字节。
+        
+        read和write 方法在执行时都将阻塞，直至字节确实被读入或写出。
+          
+
+
 
 ## 第三章 xml
 				
